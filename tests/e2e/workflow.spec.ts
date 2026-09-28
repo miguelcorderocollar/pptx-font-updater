@@ -169,6 +169,20 @@ test("saves all imported CSV rows and clears them on request", async ({
       "source,replacement,embedded_font\nArial,IBM Plex Sans,IBM Plex Sans\nUnused Family,Example Sans,"
     )
   await page.getByRole("button", { name: "Apply mappings" }).click()
+  await page.getByRole("button", { name: "View mappings" }).click()
+  const mappingsDialog = page.getByRole("dialog", { name: "Loaded mappings" })
+  await expect(mappingsDialog.getByRole("row")).toHaveCount(3)
+  await expect(
+    mappingsDialog.getByRole("row", {
+      name: "Arial IBM Plex Sans IBM Plex Sans",
+    })
+  ).toBeVisible()
+  await expect(
+    mappingsDialog.getByRole("row", {
+      name: "Unused Family Example Sans None",
+    })
+  ).toBeVisible()
+  await mappingsDialog.getByRole("button", { name: "Close" }).click()
   await expect(page.getByLabel("Replacement for Arial")).toHaveValue(
     "IBM Plex Sans"
   )
@@ -184,6 +198,16 @@ test("saves all imported CSV rows and clears them on request", async ({
 
   await page.getByRole("button", { name: "Start over" }).click()
   await expect(page.getByText("2 font replacements ready")).toBeVisible()
+  await page.getByRole("button", { name: "View mappings" }).click()
+  await expect(
+    page
+      .getByRole("dialog", { name: "Loaded mappings" })
+      .getByRole("row", { name: "Unused Family Example Sans None" })
+  ).toBeVisible()
+  await page
+    .getByRole("dialog", { name: "Loaded mappings" })
+    .getByRole("button", { name: "Close" })
+    .click()
   await page.reload()
   await page
     .getByLabel("Drop PowerPoint files here")

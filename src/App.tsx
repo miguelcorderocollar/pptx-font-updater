@@ -16,6 +16,7 @@ import { FontLibrary } from "@/components/font-library"
 import { InspectionSummaryBar } from "@/components/inspection-summary"
 import { MappingTable, type MappingRow } from "@/components/mapping-table"
 import { ShareMappingsButton } from "@/components/share-mappings-button"
+import { ViewMappingsButton } from "@/components/view-mappings-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -681,6 +682,7 @@ export function App() {
                     <div className="flex items-center justify-between gap-2">
                       <CardTitle>Saved mappings</CardTitle>
                       <div className="flex flex-wrap gap-1">
+                        <ViewMappingsButton mappings={savedMappings} />
                         <ShareMappingsButton mappings={savedMappings} />
                         <Button
                           variant="ghost"

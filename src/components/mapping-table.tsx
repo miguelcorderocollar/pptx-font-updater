@@ -16,6 +16,7 @@ import Papa from "papaparse"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ShareMappingsButton } from "@/components/share-mappings-button"
+import { ViewMappingsButton } from "@/components/view-mappings-button"
 import {
   Dialog,
   DialogContent,
@@ -197,6 +198,7 @@ export function MappingTable({
             <DownloadIcon data-icon="inline-start" /> Export CSV
           </Button>
           <ShareMappingsButton mappings={savedMappings} />
+          <ViewMappingsButton mappings={savedMappings} />
           <Button
             variant="ghost"
             size="sm"
