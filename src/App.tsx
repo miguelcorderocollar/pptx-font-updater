@@ -15,6 +15,7 @@ import { FilePickerCard } from "@/components/file-picker-card"
 import { FontLibrary } from "@/components/font-library"
 import { InspectionSummaryBar } from "@/components/inspection-summary"
 import { MappingTable, type MappingRow } from "@/components/mapping-table"
+import { MappingsDialogContent } from "@/components/mappings-dialog-content"
 import { ShareMappingsButton } from "@/components/share-mappings-button"
 import { ViewMappingsButton } from "@/components/view-mappings-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -883,41 +884,16 @@ export function App() {
           if (!open) dismissIncomingShare()
         }}
       >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
-              {incomingShare?.kind === "valid"
-                ? "Import shared mappings"
-                : "Mapping link unavailable"}
-            </DialogTitle>
-            <DialogDescription>
-              {incomingShare?.kind === "valid"
-                ? `${incomingShare.mappings.length} font mapping${incomingShare.mappings.length === 1 ? "" : "s"} in this link. Matching saved sources will be replaced; other mappings stay.`
-                : incomingShare?.message}
-            </DialogDescription>
-          </DialogHeader>
-          {incomingShare?.kind === "valid" ? (
-            <div className="max-h-48 overflow-auto rounded-lg border p-3 text-sm">
-              {incomingShare.mappings.slice(0, 8).map((mapping) => (
-                <p key={mapping.source} className="py-0.5">
-                  {mapping.source} → {mapping.replacement}
-                  {mapping.embeddedFont
-                    ? " · embed when font file is available"
-                    : ""}
-                </p>
-              ))}
-              {incomingShare.mappings.length > 8 ? (
-                <p className="pt-1 text-muted-foreground">
-                  And {incomingShare.mappings.length - 8} more
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-          <DialogFooter>
-            <Button variant="outline" onClick={dismissIncomingShare}>
-              {incomingShare?.kind === "valid" ? "Cancel" : "Close"}
-            </Button>
-            {incomingShare?.kind === "valid" ? (
+        {incomingShare?.kind === "valid" ? (
+          <MappingsDialogContent
+            title="Import shared mappings"
+            description={`${incomingShare.mappings.length} font mapping${incomingShare.mappings.length === 1 ? "" : "s"} in this link. Matching saved sources will be replaced; other mappings stay.`}
+            mappings={incomingShare.mappings}
+          >
+            <DialogFooter>
+              <Button variant="outline" onClick={dismissIncomingShare}>
+                Cancel
+              </Button>
               <Button
                 onClick={() => {
                   importMappings(incomingShare.mappings)
@@ -926,9 +902,21 @@ export function App() {
               >
                 Import mappings
               </Button>
-            ) : null}
-          </DialogFooter>
-        </DialogContent>
+            </DialogFooter>
+          </MappingsDialogContent>
+        ) : (
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Mapping link unavailable</DialogTitle>
+              <DialogDescription>{incomingShare?.message}</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={dismissIncomingShare}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
 
       <footer className="border-t bg-background">

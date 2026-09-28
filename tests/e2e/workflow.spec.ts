@@ -250,7 +250,15 @@ test("shares saved CSV mappings in a link and imports them on another browser", 
   await page
     .getByLabel("CSV mappings")
     .fill(
-      "source,replacement,embedded_font\nArial,IBM Plex Sans,IBM Plex Sans\nUnused Family,Example Sans,"
+      [
+        "source,replacement,embedded_font",
+        "Arial,IBM Plex Sans,IBM Plex Sans",
+        "Unused Family,Example Sans,",
+        ...Array.from(
+          { length: 8 },
+          (_, index) => `Extra Family ${index + 1},Example Sans,`
+        ),
+      ].join("\n")
     )
   await page.getByRole("button", { name: "Apply mappings" }).click()
   await page.getByRole("button", { name: "Share link" }).click()
@@ -270,7 +278,21 @@ test("shares saved CSV mappings in a link and imports them on another browser", 
       recipient.getByRole("dialog", { name: "Import shared mappings" })
     ).toBeVisible()
     await expect(
-      recipient.getByText("2 font mappings in this link.")
+      recipient.getByText("10 font mappings in this link.")
+    ).toBeVisible()
+    const sharedDialog = recipient.getByRole("dialog", {
+      name: "Import shared mappings",
+    })
+    await expect(sharedDialog.getByRole("row")).toHaveCount(11)
+    await expect(
+      sharedDialog.getByRole("row", {
+        name: "Arial IBM Plex Sans IBM Plex Sans",
+      })
+    ).toBeVisible()
+    await expect(
+      sharedDialog.getByRole("row", {
+        name: "Extra Family 8 Example Sans None",
+      })
     ).toBeVisible()
     await recipient.getByRole("button", { name: "Cancel" }).click()
     await expect(recipient.getByText("Saved mappings")).toHaveCount(0)
@@ -278,7 +300,9 @@ test("shares saved CSV mappings in a link and imports them on another browser", 
 
     await recipient.goto(link)
     await recipient.getByRole("button", { name: "Import mappings" }).click()
-    await expect(recipient.getByText("2 font replacements ready")).toBeVisible()
+    await expect(
+      recipient.getByText("10 font replacements ready")
+    ).toBeVisible()
     await recipient.reload()
     await recipient
       .getByLabel("Drop PowerPoint files here")
